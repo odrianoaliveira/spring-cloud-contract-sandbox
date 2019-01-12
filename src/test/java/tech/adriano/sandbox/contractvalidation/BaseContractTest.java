@@ -2,17 +2,33 @@ package tech.adriano.sandbox.contractvalidation;
 
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.Before;
-import tech.adriano.sandbox.contractvalidation.model.IP;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.context.WebApplicationContext;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-public class BaseContractTest {
+@ActiveProfiles("test")
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@AutoConfigureWireMock(port = 9090)
+public abstract class BaseContractTest {
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Before
     public void setup() {
-        IpService ipService = mock(IpService.class);
-        when(ipService.getIp()).thenReturn(IP.builder().origin("10.0.0.1").url("http://mock.org").build());
-        RestAssuredMockMvc.standaloneSetup(new IpController(ipService));
+        stubFor(get(urlEqualTo("/get"))
+                .willReturn(
+                        aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody("{\"origin\":\"10.0.0.1\",\"url\": \"https://httpbin.org/get\"}")));
+        RestAssuredMockMvc.webAppContextSetup(context);
     }
 }
