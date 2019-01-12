@@ -1,0 +1,8 @@
+server.port: 8080
+httpbin.url: https://httpbin.org
+
+---
+
+spring.profiles: test
+
+httpbin.url: http://localhost:9090
