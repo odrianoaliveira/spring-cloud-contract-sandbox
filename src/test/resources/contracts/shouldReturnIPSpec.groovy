@@ -12,6 +12,6 @@ Contract.make {
         headers {
             contentType applicationJsonUtf8()
         }
-        body(origin: "10.0.0.1", url: "http://mock.org")
+        body(origin: "10.0.0.1", url: "https://httpbin.org/get")
     }
 }
